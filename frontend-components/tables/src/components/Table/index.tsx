@@ -7,6 +7,8 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable,
+  Column,
+  Row,
 } from "@tanstack/react-table";
 import clsx from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -110,7 +112,7 @@ function getCellWidth(row, column) {
   }
 }
 
-export const EXPORT_TYPES = ["csv", "xlsx", "png"];
+export const EXPORT_TYPES = ["csv", "png"];
 export default function Table({
   data,
   columns,
@@ -179,7 +181,8 @@ export default function Table({
             : columns[0];
           const indexValue = indexLabel ? row[indexLabel] : null;
           const value = row[column];
-          const only_numbers = value?.toString().replace(/[^0-9]/g, "") ?? "";
+          const only_numbers =
+            value?.toString()?.split(".")?.[0]?.replace(/[^0-9]/g, "") ?? "";
           const probablyDate =
             only_numbers?.length >= 4 &&
             (includesDateNames(column) ||
@@ -195,7 +198,11 @@ export default function Table({
                   indexValue.toLowerCase().includes("hour") ||
                   indexValue.toLowerCase().includes("minute"))));
 
-          if (probablyDate && isoYearRegex.test(value?.toString()))
+          if (
+            probablyDate &&
+            value?.length === 4 &&
+            isoYearRegex.test(value?.toString())
+          )
             return value;
 
           if (probablyDate) {
@@ -217,7 +224,8 @@ export default function Table({
           const indexValue = indexLabel ? row.original[indexLabel] : null;
           const value = row.original[column];
           const valueType = typeof value;
-          const only_numbers = value?.toString().replace(/[^0-9]/g, "") ?? "";
+          const only_numbers =
+            value?.toString()?.split(".")?.[0]?.replace(/[^0-9]/g, "") ?? "";
           const probablyDate =
             only_numbers?.length >= 4 &&
             (includesDateNames(column) ||
@@ -244,14 +252,15 @@ export default function Table({
               </a>
             );
           }
-          if (probablyDate && isoYearRegex.test(value?.toString())) {
-            return <p>{value}</p>;
-          }
+
           if (
             probablyDate &&
-            !isNaN(new Date(value).getTime()) &&
-            !isoYearRegex.test(value?.toString())
+            value?.length === 4 &&
+            isoYearRegex.test(value?.toString())
           ) {
+            return <p>{value}</p>;
+          }
+          if (probablyDate && !isNaN(new Date(value).getTime())) {
             if (typeof value === "string") {
               const date = value.split("T")[0];
               const time = value.split("T")[1]?.split(".")[0];
@@ -427,7 +436,7 @@ export default function Table({
             <div
               className="_header relative gap-4 py-2 text-center text-xs flex items-center justify-between px-4 text-white"
               style={{
-                fontSize: `${Number(fontSize) * 100}%`,
+                fontSize: `${Number(fontSize) * 90}%`,
               }}
             >
               <div className="w-1/3">
@@ -466,14 +475,14 @@ export default function Table({
                 </p>
               )} */}
             </div>
-            <div className="overflow-auto max-h-[calc(100vh-160px)] smh:max-h-[calc(100vh-95px)]">
-              <table
-                className="text-sm relative"
-                style={{
-                  fontSize: `${Number(fontSize) * 100}%`,
-                }}
-              >
-                <thead className="sticky top-0 bg-white dark:bg-grey-900">
+            <div className="overflow-auto max-h-[calc(100vh-170px)] smh:max-h-[calc(100vh-95px)]">
+              <table className="text-sm relative">
+                <thead
+                  className="sticky top-0 bg-white dark:bg-grey-900"
+                  style={{
+                    fontSize: `${Number(fontSize) * 100}%`,
+                  }}
+                >
                   {table.getHeaderGroups().map((headerGroup, idx) => (
                     <tr key={headerGroup.id}>
                       {headerGroup.headers.map((header, idx2) => {
@@ -498,6 +507,9 @@ export default function Table({
                       <tr
                         key={row.id}
                         className="!h-[64px] border-b border-grey-400"
+                        style={{
+                          fontSize: `${Number(fontSize) * 100}%`,
+                        }}
                       >
                         {row.getVisibleCells().map((cell, idx2) => {
                           return (
@@ -539,6 +551,7 @@ export default function Table({
                             className="text-grey-500 bg-grey-100 dark:bg-grey-850 font-normal text-left text-sm h-10 p-4"
                             style={{
                               width: header.getSize(),
+                              fontSize: `${Number(fontSize) * 100}%`,
                             }}
                           >
                             {header.isPlaceholder
@@ -572,7 +585,7 @@ export default function Table({
                   <DialogPrimitive.Title className="uppercase font-bold tracking-widest">
                     Settings
                   </DialogPrimitive.Title>
-                  <div className="grid grid-cols-2 gap-4 mt-10 text-sm">
+                  <div className="grid grid-cols-2 gap-2 mt-10 text-sm">
                     {needsReorder && (
                       <button onClick={() => resetOrder()} className="_btn h-9">
                         Reset Order
