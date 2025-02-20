@@ -23,16 +23,13 @@ export default function Export({
       case "csv":
         downloadData("csv", columns, data, downloadFinished);
         break;
-      case "xlsx":
-        downloadData("xlsx", columns, data, downloadFinished);
-        break;
       case "png":
         downloadImage("table", downloadFinished);
         break;
     }
   };
   return (
-    <div className="flex gap-6 items-center">
+    <div className="flex gap-2 items-center">
       <Select
         labelType="row"
         value={type}

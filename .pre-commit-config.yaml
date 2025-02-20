@@ -3,6 +3,7 @@ repos:
     rev: v4.4.0
     hooks:
       - id: check-yaml
+        exclude: 'construct.yaml'
       - id: end-of-file-fixer
         exclude_types: [css, markdown, text, svg]
       - id: trailing-whitespace
@@ -10,13 +11,25 @@ repos:
       - id: check-merge-conflict
       - id: detect-private-key
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 24.4.2
     hooks:
       - id: black
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.256"
+    rev: "v0.4.5"
     hooks:
       - id: ruff
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        additional_dependencies: [tomli]
+        name: pydocstyle
+        entry: pydocstyle
+        language: python
+        types: [python]
+        files: '^(openbb_platform/|cli/).*\.py$'
+        exclude: 'tests/.*\.py|openbb_platform/test_.*\.py'
+        args: ["--config=ruff.toml"]
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.5
     hooks:
@@ -24,13 +37,13 @@ repos:
         entry: codespell
         args:
           [
-            "--ignore-words-list=VAI,MIS,shs,gard,te,commun,ro,zar,vie,hel,jewl,zlot,ba,buil,coo,ether,hist,hsi,mape,navagation,operatio,pres,ser,yeld,shold,ist,varian,datas,ake,creat,statics,ket,toke,certi,buidl,ot",
+            "--ignore-words=.codespell.ignore",
             "--quiet-level=2",
-            "--skip=./tests,.git,*.css,*.csv,*.html,*.ini,*.ipynb,*.js,*.json,*.lock,*.scss,*.txt,*.yaml,build/pyinstaller/*,./website/config.toml",
-            "-x=openbb_terminal/economy/fedreserve_model.py",
-            "-x=.github/workflows/linting.yml"
+            "--skip=./**/tests/**,./**/test_*.py,.git,*.css,*.csv,*.html,*.ini,*.ipynb,*.js,*.json,*.lock,*.scss,*.txt,*.yaml,build/pyinstaller/*,./website/config.toml",
+            "-x=.github/workflows/general-linting.yml"
           ]
-  - repo: local
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: "v1.6.1"
     hooks:
       - id: mypy
         name: mypy
@@ -38,8 +51,10 @@ repos:
         entry: mypy
         language: python
         "types_or": [python, pyi]
-        args: ["--ignore-missing-imports", "--scripts-are-modules"]
+        args: ["--ignore-missing-imports", "--scripts-are-modules", "--check-untyped-defs"]
+        additional_dependencies: ["types-requests", "types-setuptools"]
         require_serial: true
+        exclude: 'test_.*\.py'
   - repo: https://github.com/kynan/nbstripout
     rev: 0.6.1
     hooks:
@@ -49,7 +64,7 @@ repos:
     hooks:
       - id: pylint
         name: pylint
-        entry: pylint openbb_terminal terminal.py tests -j 0
+        entry: pylint
         language: system
         types: [python]
   - repo: https://github.com/Yelp/detect-secrets
@@ -61,17 +76,6 @@ repos:
             "--baseline",
             ".secrets.baseline",
             "--exclude-files",
-            "cassettes/*",
-            "--exclude-files",
-            "record/*",
-            "--exclude-files",
-            "website/content/api/*",
+            "cassettes/.*|record/.*|website/content/api/.*|openbb_platform/extensions/charting/openbb_charting/infrastructure/assets/.*\\.js|openbb_platform/extensions/charting/openbb_charting/infrastructure/.*\\.html",
           ]
-        exclude: package.lock.json
-  - repo: local
-    hooks:
-      - id: reserved_args
-        name: Check validity of reserved arguments
-        entry: python custom_pre_commit/check_reserved_args.py
-        language: system
-        types: [python]
+    exclude: package.lock.json

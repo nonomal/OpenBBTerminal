@@ -1,6 +1,6 @@
 import { rankItem } from "@tanstack/match-sorter-utils";
 import domtoimage from "dom-to-image";
-import { utils, writeFile } from "xlsx";
+
 
 export function formatNumberNoMagnitude(value: number | string) {
   if (typeof value === "string") {
@@ -27,9 +27,10 @@ export function formatNumberMagnitude(value: number | string, column?: string) {
       value.toString().split(".")[1]?.length || 0,
     );
     const toFixed = Math.min(4, decimalPlaces);
-    if (value < 1000) {
+    if (value < 5) {
       return value.toFixed(toFixed) || 0;
     }
+    value = Number(value.toFixed(2));
   }
 
   if (
@@ -223,7 +224,7 @@ export const saveToFile = (
 };
 
 export async function downloadData(
-  type: "csv" | "xlsx",
+  type: "csv",
   columns: any,
   data: any,
   downloadFinished: (changed: boolean) => void,
@@ -269,19 +270,6 @@ export async function downloadData(
 
     return;
   }
-
-  const wb = utils.book_new();
-  const ws = utils.aoa_to_sheet(csvData);
-  utils.book_append_sheet(wb, ws, "Sheet1");
-  await loadingOverlay("Saving XLSX");
-  non_blocking(async function () {
-    // @ts-ignore
-    // timeout to allow loading overlay to show
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    writeFile(wb, `${window.title}.xlsx`);
-    await loadingOverlay("", true);
-    downloadFinished?.(true);
-  }, 2)();
 }
 
 export async function downloadImage(

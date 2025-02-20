@@ -1,5 +1,5 @@
+# General
 __pycache__/
-logs/
 *.pyc
 .DS_Store
 *.env
@@ -13,61 +13,51 @@ venv/
 !notebooks/jupyter/.gitkeep
 .python-version
 .mypy_cache
+.ruff_cache
+.pytest_cache
 iframe_figures/
 exports/*
 .idea
 .coverage
 .scannerwork
 htmlcov
-openbb_terminal/config_plot.py
-openbb_terminal/config_terminal.py
-openbb_terminal/feature_flags.py
-openbb_terminal/reports/stored/*
-!openbb_terminal/reports/stored/.gitkeep
-!openbb_terminal/dashboards/voila/*.ipynb
-!openbb_terminal/reports/*.ipynb
-openbb_terminal/portfolio/portfolios/*
 **/.ipynb_checkpoints
 *.swp
 *.http
 .coverage.*
-!openbb_terminal/reports/templates/*.ipynb
 *_tests.csv
-integration_test_output/
-integration_test_summary/
-openbb_terminal/reports/templates/*.html
-website/functions
 *_sdk_audit.csv
-website/terminaltest
 !build/docker/compose.env
-openbb_terminal/core/plots/assets/plotly*.js
 .dccache
 *rome.json
 **/node_modules/*
-# pyinstaller artifacts
+.cursorignore
+darts_logs/
+custom_imports/*.csv
+custom_imports/*/*.csv
+cache/
+lightning_logs/
+*/mocked_path
+*.pem
+
+# CLI
 *.pyo
-dist/*
-build/terminal
+**/dist/*
+build/cli
 build/nsis/app
 DMG/*
 *.dmg
 *.sh
+cli/openbb_cli/assets/styles/user/hub.richstyle.json
 
-# User stylesheets
-openbb_terminal/miscellaneous/styles/user/hub.richstyle.json
+# Platform
+openbb_platform/openbb/package/*
 
-# the file containing the API keys for the web version
-openbb_terminal_web/setenv
+# Dev Container env
+obb/*
 
-# dart models
-darts_logs/
-
-# User data
-custom_imports/*.csv
-custom_imports/*/*.csv
-
-# cache
-cache/
-
-# lightning logs
-lightning_logs/
+# OpenBB Distribution
+!build/conda/installer/*.sh
+*.pkg
+*.exe
+build/conda/tmp

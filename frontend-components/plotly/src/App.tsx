@@ -19,7 +19,7 @@ declare global {
 }
 
 function App() {
-  const [data, setData] = useState(
+  const [json_data, setData] = useState(
     process.env.NODE_ENV === "production" ? null : candlestickMockup,
   );
   const [options, setOptions] = useState({});
@@ -28,9 +28,9 @@ function App() {
     if (process.env.NODE_ENV === "production") {
       const interval = setInterval(() => {
         if (window.json_data) {
-          const data = window.json_data;
-          console.log(data);
-          setData(data);
+          const plotly_json = window.json_data;
+          console.log(plotly_json);
+          setData(plotly_json);
           clearInterval(interval);
         }
       }, 100);
@@ -70,7 +70,7 @@ function App() {
             globals.old_margin = { ...margin };
             if (margin.t !== undefined && margin.t > 40) margin.t = 40;
 
-            if (data.cmd === "/stocks/candle") margin.r -= 50;
+            if (data.cmd === "/equity/price/historical") margin.r -= 50;
           }
       });
     }
@@ -79,15 +79,13 @@ function App() {
     // to make sure that the legend is not cut off
     data.data.forEach(function (trace) {
       if (trace.name !== undefined) {
-        const name_length = trace.name.length;
-        trace.name = `${trace.name}      `;
         trace.hoverlabel = {
-          namelength: name_length,
+          namelength: -1,
         };
       }
     });
 
-    const title = data.layout?.title?.text || "Interactive Chart";
+    const title = data.layout?.title?.text || "OpenBB Platform";
     globals.title = title;
     return {
       data: data,
@@ -103,7 +101,7 @@ function App() {
     };
   };
 
-  const transformedData = transformData(data);
+  const transformedData = transformData(json_data);
 
   if (transformedData) {
     if (transformedData.posthog.collect_logs && !options) {
